@@ -1,6 +1,5 @@
 # ifs18005-p5-springboot-todolist
 
-<<<<<<< HEAD
 Aplikasi web Todo List berbasis **Spring Boot 4.1.2**, **Maven**, **Vaadin 25.3.4**, dan **JDBC (PostgreSQL)**, dengan arsitektur **Clean Architecture** (domain, usecase, adapter, framework).
 
 | | |
@@ -9,24 +8,11 @@ Aplikasi web Todo List berbasis **Spring Boot 4.1.2**, **Maven**, **Vaadin 25.3.
 | Artifact Maven | `ifs18005-springboot-todolist` |
 | Package | `org.delcom.ifs18005springboottodolist` |
 | Database | `pbo2026_todolist` |
-=======
-Aplikasi web Todo List berbasis **Spring Boot**, **Maven**, dan **Vaadin**, dengan arsitektur **Clean Architecture**.
-
-Data disimpan **in-memory** (belum memakai database). Port dikonfigurasi lewat `.env` (`APP_PORT`).
-
-> **Penamaan proyek mahasiswa:** `{username}-springboot-todolist`  
-> **Package:** `org.delcom.{username}springboottodolist`  
-> Contoh di repo ini memakai username `ifs18005`. Ganti sesuai username Anda.
->>>>>>> d696c30f62b39832e279c76f0bd9e553d4071cef
 
 ## Prasyarat
 
 - JDK 25
-<<<<<<< HEAD
 - PostgreSQL — buat database terlebih dahulu:
-=======
-- Maven Wrapper (`mvnw` / `mvnw.cmd`)
->>>>>>> d696c30f62b39832e279c76f0bd9e553d4071cef
 
 ```sql
 CREATE DATABASE pbo2026_todolist;
@@ -41,9 +27,10 @@ Salin `.env.example` menjadi `.env` (file `.env` diabaikan git):
 ```env
 APP_PORT=8080
 
+DB_CONNECTION=pgsql
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=pbo2026_todolist
+DB_DATABASE=pbo2026_todolist
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 
@@ -54,6 +41,21 @@ UPLOAD_DIR=uploads
 ```
 
 Akun admin di-seed otomatis saat start dari `ROOT_USERNAME` / `ROOT_PASSWORD`. Upload disimpan di `UPLOAD_DIR` dan dilayani di `/uploads/**`.
+
+`DotEnv` hanya mengisi system property jika variabel lingkungan / property dengan nama yang sama **belum** ada. Di server/cloud, nilai `DB_*` dari environment platform yang dipakai.
+
+**Env DB yang didukung (selaras platform deploy):**
+
+| Variabel | Keterangan |
+| --- | --- |
+| `DB_CONNECTION` | `pgsql` (informasional; driver tetap PostgreSQL) |
+| `DB_HOST` | host Postgres/PgBouncer |
+| `DB_PORT` | port (contoh cloud: `6432`) |
+| `DB_DATABASE` | nama database (utama; di cloud: `db_<website_id>` dengan `-` diganti `_`) |
+| `DB_USERNAME` | user DB |
+| `DB_PASSWORD` | password DB |
+
+`application.yaml` memakai `${DB_DATABASE}` tanpa default — wajib diisi lewat `.env` / environment.
 
 ## Fitur
 
@@ -68,7 +70,6 @@ Akun admin di-seed otomatis saat start dari `ROOT_USERNAME` / `ROOT_PASSWORD`. U
 ## Struktur singkat
 
 ```text
-<<<<<<< HEAD
 src/main/java/org/delcom/ifs18005springboottodolist/
 ├── domain/          # entity, exception, repository port, PasswordHasher
 ├── usecase/         # AuthUseCase, TodoUseCase, UserUseCase
@@ -93,31 +94,15 @@ Login admin: sesuai `ROOT_USERNAME` / `ROOT_PASSWORD` di `.env`.
 
 ### Build JAR (profil production Vaadin)
 
+Jalankan dari **root proyek** agar `.env` terbaca (jika tidak di-override environment):
+
 ```powershell
 .\mvnw.cmd clean package -Pproduction
 java -jar target\ifs18005-springboot-todolist-0.0.1-SNAPSHOT.jar
-=======
-ifs18005-springboot-todolist/
-├── .env / .env.example
-├── pom.xml
-├── src/main/java/org/delcom/ifs18005springboottodolist/
-│   ├── App.java              # entry point (@SpringBootApplication)
-│   ├── DotEnv.java           # muat .env ke system properties
-│   ├── config/AppConfig.java # composition root Spring (@Bean)
-│   ├── domain/               # entity, exception, repository port
-│   ├── usecase/              # TodoUseCase
-│   ├── adapter/              # InMemoryRepository, TodoRepository, TodoPresenter
-│   └── framework/view/       # TodoView (Vaadin)
-├── src/main/resources/
-│   └── application.yaml
-└── src/test/java/.../
-    └── AppTest.java
->>>>>>> d696c30f62b39832e279c76f0bd9e553d4071cef
 ```
 
 Tanpa `-Pproduction`, menjalankan JAR biasanya gagal (`vaadin-dev-server not found`).
 
-<<<<<<< HEAD
 ## Uji & coverage
 
 ```powershell
@@ -126,65 +111,12 @@ Tanpa `-Pproduction`, menjalankan JAR biasanya gagal (`vaadin-dev-server not fou
 
 - Jacoco mengecualikan `framework/view` dan `framework/auth`
 - Laporan: `target/site/jacoco/index.html`
-=======
-```env
-APP_PORT=8080
-```
 
-`application.yaml` memakai:
+## Troubleshooting JAR di server/cloud
 
-```yaml
-server:
-  port: ${APP_PORT:8080}
-```
+Jika log berisi `Gagal menginisialisasi schema database` / `Connection ... refused`, **JAR sudah berhasil di-build**; yang gagal adalah koneksi database.
 
-Salin dari `.env.example` jika `.env` belum ada. File `.env` diabaikan git.
-
-## Perintah Build & Menjalankan
-
-### 1. Development (disarankan)
-
-```powershell
-.\mvnw.cmd spring-boot:run
-```
-
-Atau dari Cursor/VS Code: Run and Debug → **TodoList (DevTools)**.
-
-Buka [http://localhost:8080](http://localhost:8080) (atau port di `APP_PORT`).
-
-Spring Boot DevTools aktif: simpan file → compile → auto-restart + live-reload.
-
-Kalau autobuild IDE tidak jalan:
-
-```powershell
-.\dev.ps1
-```
-
-### 2. Uji + coverage Jacoco 100%
-
-```powershell
-.\mvnw.cmd clean verify
-```
-
-Laporan: `target/site/jacoco/index.html`
-
-### 3. Build & jalankan JAR (wajib `-Pproduction`)
-
-Tanpa `-Pproduction`, `java -jar` gagal (`vaadin-dev-server not found`) karena `vaadin-dev` tidak ikut ke JAR.
-
-```powershell
-.\mvnw.cmd clean package -Pproduction
-java -jar target\ifs18005-springboot-todolist-0.0.1-SNAPSHOT.jar
-```
-
-Jalankan dari root proyek agar file `.env` terbaca.
-
-## Fitur UI
-
-- Tambah, ubah, hapus todo
-- Cari berdasarkan judul
-- Urutkan lewat klik header kolom
-- Ringkasan jumlah todo / selesai / belum selesai
-- Tanggal dibuat, tanggal selesai, dan durasi
-- Penyimpanan sementara di memori (reset saat aplikasi di-restart)
->>>>>>> d696c30f62b39832e279c76f0bd9e553d4071cef
+1. Pastikan PostgreSQL (atau PgBouncer) hidup dan menerima TCP dari host aplikasi.
+2. Cocokkan `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (environment server mengalahkan `.env`).
+3. Pastikan database sudah ada / dibuat di platform.
+4. Contoh error `Connection to delcom-deployment-pgbouncer:6432 refused` berarti host/port DB tidak reachable — perbaiki layanan DB/PgBouncer atau jaringan, bukan rebuild Vaadin.

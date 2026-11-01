@@ -40,7 +40,11 @@ public final class SchemaInitializer {
                     )
                     """);
         } catch (SQLException ex) {
-            throw new IllegalStateException("Gagal menginisialisasi schema database", ex);
+            throw new IllegalStateException(
+                    "Gagal menginisialisasi schema database: " + ex.getMessage()
+                            + " (periksa DB_HOST/DB_PORT/DB_DATABASE/DB_USERNAME/DB_PASSWORD dan pastikan PostgreSQL/PgBouncer menerima koneksi)",
+                    ex
+            );
         }
     }
 }
