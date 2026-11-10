@@ -84,7 +84,10 @@ Runtime memakai **JDBC + PostgreSQL**. Unit test repository memakai **InMemory**
 
 ## Menjalankan
 
+Dari direktori proyek `ifs18005-p5-springboot-todolist`:
+
 ```powershell
+cd ifs18005-p5-springboot-todolist  # jika berada di root workspace praktikum5
 .\mvnw.cmd spring-boot:run
 ```
 
