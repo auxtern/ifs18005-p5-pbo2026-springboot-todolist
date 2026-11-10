@@ -19,7 +19,7 @@ spring:
       enabled: true
 
 server:
-  port: ${APP_PORT}
+  port: ${APP_PORT:${PORT:8080}}
   servlet:
     session:
       timeout: 8h
@@ -28,9 +28,9 @@ server:
         http-only: true
 
 app:
-  root-username: ${ROOT_USERNAME}
-  root-password: ${ROOT_PASSWORD}
-  upload-dir: ${UPLOAD_DIR}
+  root-username: ${ROOT_USERNAME:admin}
+  root-password: ${ROOT_PASSWORD:admin}
+  upload-dir: ${UPLOAD_DIR:uploads}
 
 vaadin:
   launch-browser: false

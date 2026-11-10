@@ -57,15 +57,15 @@ public class AppConfig {
     }
 
     @Bean
-    public FileStorage fileStorage(@Value("${app.upload-dir}") String uploadDir) {
+    public FileStorage fileStorage(@Value("${app.upload-dir:uploads}") String uploadDir) {
         return new FileStorage(uploadDir);
     }
 
     @Bean
     public ApplicationRunner seedRootAdmin(
             AuthUseCase authUseCase,
-            @Value("${app.root-username}") String rootUsername,
-            @Value("${app.root-password}") String rootPassword
+            @Value("${app.root-username:admin}") String rootUsername,
+            @Value("${app.root-password:admin}") String rootPassword
     ) {
         return args -> authUseCase.ensureRootAdmin(rootUsername, rootPassword);
     }
