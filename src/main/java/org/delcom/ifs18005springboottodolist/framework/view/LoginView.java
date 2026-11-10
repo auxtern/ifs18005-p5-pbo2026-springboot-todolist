@@ -40,6 +40,8 @@ public class LoginView extends VerticalLayout {
 
         TextField username = new TextField("Username");
         PasswordField password = new PasswordField("Password");
+        username.setId("login-username");
+        password.setId("login-password");
         username.setWidthFull();
         password.setWidthFull();
         // Agar nilai sudah sampai server sebelum Enter memicu submit.
@@ -52,6 +54,7 @@ public class LoginView extends VerticalLayout {
         loadingBar.setWidthFull();
 
         Button loginButton = new Button("Masuk");
+        loginButton.setId("login-submit");
 
         Runnable submit = () -> {
             loadingBar.setVisible(true);
