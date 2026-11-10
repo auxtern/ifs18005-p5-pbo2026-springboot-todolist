@@ -9,10 +9,10 @@
         <relativePath/>
     </parent>
     <groupId>org.delcom</groupId>
-    <artifactId>ifs18005-springboot-todolist</artifactId>
+    <artifactId>ifs18005-p5-pbo2026-springboot-todolist</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ifs18005-springboot-todolist</name>
-    <description>ifs18005-springboot-todolist</description>
+    <name>ifs18005-p5-pbo2026-springboot-todolist</name>
+    <description>ifs18005-p5-pbo2026-springboot-todolist</description>
     <url/>
     <licenses>
         <license/>

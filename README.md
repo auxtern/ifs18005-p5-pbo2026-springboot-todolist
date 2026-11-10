@@ -1,11 +1,11 @@
-# ifs18005-p5-springboot-todolist
+# ifs18005-p5-pbo2026-springboot-todolist
 
 Aplikasi web Todo List berbasis **Spring Boot 4.1.2**, **Maven**, **Vaadin 25.3.4**, dan **JDBC (PostgreSQL)**, dengan arsitektur **Clean Architecture** (domain, usecase, adapter, framework).
 
 | | |
 | --- | --- |
-| Folder | `ifs18005-p5-springboot-todolist` |
-| Artifact Maven | `ifs18005-springboot-todolist` |
+| Folder | `ifs18005-p5-pbo2026-springboot-todolist` |
+| Artifact Maven | `ifs18005-p5-pbo2026-springboot-todolist` |
 | Package | `org.delcom.ifs18005springboottodolist` |
 | Database | `pbo2026_todolist` |
 
@@ -84,10 +84,10 @@ Runtime memakai **JDBC + PostgreSQL**. Unit test repository memakai **InMemory**
 
 ## Menjalankan
 
-Dari direktori proyek `ifs18005-p5-springboot-todolist`:
+Dari direktori proyek `ifs18005-p5-pbo2026-springboot-todolist`:
 
 ```powershell
-cd ifs18005-p5-springboot-todolist  # jika berada di root workspace praktikum5
+cd ifs18005-p5-pbo2026-springboot-todolist  # jika berada di root workspace praktikum5
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -101,7 +101,7 @@ Jalankan dari **root proyek** agar `.env` terbaca (jika tidak di-override enviro
 
 ```powershell
 .\mvnw.cmd clean package -Pproduction
-java -jar target\ifs18005-springboot-todolist-0.0.1-SNAPSHOT.jar
+java -jar target\ifs18005-p5-pbo2026-springboot-todolist-0.0.1-SNAPSHOT.jar
 ```
 
 Tanpa `-Pproduction`, menjalankan JAR biasanya gagal (`vaadin-dev-server not found`).

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ifs18005-springboot-todolist
+    name: ifs18005-p5-pbo2026-springboot-todolist
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}
     username: ${DB_USERNAME}
