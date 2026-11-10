@@ -13,6 +13,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -79,11 +80,28 @@ public class ProfileView extends VerticalLayout {
         upload.setMaxFiles(1);
         upload.setWidthFull();
 
-        Button savePhoto = new Button("Simpan Foto", event -> {
+        ProgressBar loadingBar = new ProgressBar();
+        loadingBar.setIndeterminate(true);
+        loadingBar.setVisible(false);
+        loadingBar.setWidthFull();
+
+        Button savePhoto = new Button("Simpan Foto");
+        savePhoto.getStyle().set("cursor", "pointer");
+
+        Button saveProfile = new Button("Simpan Profil");
+        saveProfile.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveProfile.getStyle().set("margin-top", "0.5rem");
+        saveProfile.getStyle().set("cursor", "pointer");
+
+        savePhoto.addClickListener(event -> {
+            loadingBar.setVisible(true);
+            savePhoto.setEnabled(false);
             try {
                 String filename = pendingPhotoName.get();
                 byte[] data = pendingPhotoData.get();
                 if (filename == null || filename.isBlank() || data == null) {
+                    loadingBar.setVisible(false);
+                    savePhoto.setEnabled(true);
                     showError("Pilih file foto terlebih dahulu");
                     return;
                 }
@@ -93,25 +111,33 @@ public class ProfileView extends VerticalLayout {
                 refreshPhoto(updated);
                 pendingPhotoName.set(null);
                 pendingPhotoData.set(null);
+                loadingBar.setVisible(false);
+                savePhoto.setEnabled(true);
                 showSuccess("Foto profil diperbarui");
                 UI.getCurrent().navigate(ProfileView.class);
             } catch (ValidationException | EntityNotFoundException | IOException ex) {
+                loadingBar.setVisible(false);
+                savePhoto.setEnabled(true);
                 showError(ex.getMessage());
             }
         });
 
-        Button saveProfile = new Button("Simpan Profil", event -> {
+        saveProfile.addClickListener(event -> {
+            loadingBar.setVisible(true);
+            saveProfile.setEnabled(false);
             try {
                 User updated = userUseCase.updateProfile(user.getId(), fullName.getValue(), password.getValue());
                 AuthSession.refresh(updated);
                 password.clear();
+                loadingBar.setVisible(false);
+                saveProfile.setEnabled(true);
                 showSuccess("Profil diperbarui");
             } catch (ValidationException | EntityNotFoundException ex) {
+                loadingBar.setVisible(false);
+                saveProfile.setEnabled(true);
                 showError(ex.getMessage());
             }
         });
-        saveProfile.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveProfile.getStyle().set("margin-top", "0.5rem");
 
         H1 title = new H1("Profil");
         title.getStyle().set("margin", "0");
@@ -137,8 +163,8 @@ public class ProfileView extends VerticalLayout {
                 fullName,
                 username,
                 password,
-                saveProfile
-        );
+                loadingBar,
+                saveProfile);
         card.getStyle().set("max-width", "560px");
         add(card);
     }
@@ -152,8 +178,8 @@ public class ProfileView extends VerticalLayout {
                 .set("display", "block")
                 .set("cursor", "zoom-in");
         photoPreview.getElement().setAttribute("title", "Klik untuk memperbesar");
-        photoPreview.addClickListener(event ->
-                ImagePreviewDialog.open(photoPreview.getSrc(), photoPreview.getAlt().orElse("Foto profil")));
+        photoPreview.addClickListener(
+                event -> ImagePreviewDialog.open(photoPreview.getSrc(), photoPreview.getAlt().orElse("Foto profil")));
 
         photoInitial.getStyle()
                 .set("width", "120px")

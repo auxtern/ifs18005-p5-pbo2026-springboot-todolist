@@ -128,13 +128,16 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver, AfterN
         AuthSession.currentUser().ifPresent(user -> {
             var identityItem = accountMenu.addItem(accountIdentity(user));
             identityItem.setEnabled(false);
-            accountMenu.addItem(menuItemContent(VaadinIcon.USER, "Profil", "#4B5563", "#1F2937"), event ->
+            identityItem.getStyle().set("cursor", "default");
+            var profileItem = accountMenu.addItem(menuItemContent(VaadinIcon.USER, "Profil", "#4B5563", "#1F2937"), event ->
                     UI.getCurrent().navigate(ProfileView.class));
-            accountMenu.addItem(menuItemContent(VaadinIcon.SIGN_OUT, "Keluar", "#DC2626", "#DC2626"), event -> {
+            profileItem.getStyle().set("cursor", "pointer");
+            var logoutItem = accountMenu.addItem(menuItemContent(VaadinIcon.SIGN_OUT, "Keluar", "#DC2626", "#DC2626"), event -> {
                 AuthSession.logout();
                 // Full reload agar UI tidak blank setelah keluar dari MainLayout.
                 UI.getCurrent().getPage().setLocation("login");
             });
+            logoutItem.getStyle().set("cursor", "pointer");
         });
     }
 
@@ -285,7 +288,8 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver, AfterN
                 .set("border-radius", "10px")
                 .set("box-sizing", "border-box")
                 .set("border", "1px solid transparent")
-                .set("transition", "background 0.15s ease");
+                .set("transition", "background 0.15s ease")
+                .set("cursor", "pointer");
 
         link.getElement().addEventListener("mouseover", e -> {
             if (!"true".equals(link.getElement().getAttribute("data-active"))) {

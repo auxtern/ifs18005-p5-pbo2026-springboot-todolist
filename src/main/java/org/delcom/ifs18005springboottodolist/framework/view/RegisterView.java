@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -48,21 +49,33 @@ public class RegisterView extends VerticalLayout {
         username.setValueChangeMode(ValueChangeMode.EAGER);
         password.setValueChangeMode(ValueChangeMode.EAGER);
 
+        ProgressBar loadingBar = new ProgressBar();
+        loadingBar.setIndeterminate(true);
+        loadingBar.setVisible(false);
+        loadingBar.setWidthFull();
+
+        Button registerButton = new Button("Daftar");
+
         Runnable submit = () -> {
+            loadingBar.setVisible(true);
+            registerButton.setEnabled(false);
             try {
                 User user = authUseCase.register(username.getValue(), password.getValue(), fullName.getValue());
                 AuthSession.login(user);
                 UI.getCurrent().navigate(TodoView.class);
             } catch (ValidationException ex) {
+                loadingBar.setVisible(false);
+                registerButton.setEnabled(true);
                 Notification n = Notification.show(ex.getMessage(), 4000, Notification.Position.BOTTOM_START);
                 n.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         };
 
-        Button registerButton = new Button("Daftar", event -> submit.run());
+        registerButton.addClickListener(event -> submit.run());
         registerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         registerButton.setWidthFull();
         registerButton.getStyle().set("margin-top", "0.85rem");
+        registerButton.getStyle().set("cursor", "pointer");
         fullName.addKeyUpListener(Key.ENTER, event -> submit.run());
         username.addKeyUpListener(Key.ENTER, event -> submit.run());
         password.addKeyUpListener(Key.ENTER, event -> submit.run());
@@ -76,7 +89,8 @@ public class RegisterView extends VerticalLayout {
         RouterLink loginLink = new RouterLink("Sudah punya akun? Masuk", LoginView.class);
         loginLink.getStyle()
                 .set("align-self", "flex-end")
-                .set("text-align", "right");
+                .set("text-align", "right")
+                .set("cursor", "pointer");
 
         VerticalLayout form = new VerticalLayout(
                 title,
@@ -84,9 +98,9 @@ public class RegisterView extends VerticalLayout {
                 fullName,
                 username,
                 password,
+                loadingBar,
                 registerButton,
-                loginLink
-        );
+                loginLink);
         form.setPadding(false);
         form.setSpacing(false);
         form.setWidthFull();

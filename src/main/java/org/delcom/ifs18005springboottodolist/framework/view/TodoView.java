@@ -15,6 +15,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -239,6 +240,7 @@ public class TodoView extends VerticalLayout {
     private HorizontalLayout createActionButtons(Todo todo) {
         Button deleteButton = new Button("Hapus", VaadinIcon.TRASH.create(), event -> openDeleteDialog(todo));
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY_INLINE);
+        deleteButton.getStyle().set("cursor", "pointer");
         return new HorizontalLayout(deleteButton);
     }
 
@@ -251,9 +253,13 @@ public class TodoView extends VerticalLayout {
     private HorizontalLayout buildToolbar() {
         Button addButton = new Button("Tambah", VaadinIcon.PLUS.create(), event -> openAddDialog());
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addButton.getStyle().set("cursor", "pointer");
 
         Button searchButton = new Button("Cari", VaadinIcon.SEARCH.create(), event -> searchTodos());
+        searchButton.getStyle().set("cursor", "pointer");
+
         Button refreshButton = new Button("Muat Ulang", VaadinIcon.REFRESH.create(), event -> refreshAll());
+        refreshButton.getStyle().set("cursor", "pointer");
 
         HorizontalLayout toolbar = new HorizontalLayout(
                 searchField,
@@ -278,7 +284,13 @@ public class TodoView extends VerticalLayout {
         Span uploadHint = new Span("Cover (opsional)");
 
         Dialog dialog = new Dialog();
-        Button saveButton = new Button("Simpan", VaadinIcon.CHECK.create(), event -> {
+        ProgressBar loadingBar = new ProgressBar();
+        loadingBar.setVisible(false);
+
+        Button saveButton = new Button("Simpan", VaadinIcon.CHECK.create());
+        saveButton.addClickListener(event -> {
+            loadingBar.setVisible(true);
+            saveButton.setEnabled(false);
             try {
                 User user = requireUser();
                 Todo created = todoUseCase.addTodo(user.getId(), titleField.getValue(), descriptionField.getValue());
@@ -292,8 +304,12 @@ public class TodoView extends VerticalLayout {
                 dialog.close();
                 refreshAll();
             } catch (ValidationException ex) {
+                loadingBar.setVisible(false);
+                saveButton.setEnabled(true);
                 showError(presenter.showValidationError(ex.getMessage()));
             } catch (EntityNotFoundException | IOException ex) {
+                loadingBar.setVisible(false);
+                saveButton.setEnabled(true);
                 showError(presenter.showValidationError(ex.getMessage()));
             }
         });
@@ -303,7 +319,7 @@ public class TodoView extends VerticalLayout {
         VerticalLayout body = new VerticalLayout(titleField, descriptionField, uploadHint, upload);
         body.setPadding(false);
         body.setSpacing(true);
-        buildDialog(dialog, "Menambah Todo", DialogTone.PRIMARY, body, cancelButton, saveButton);
+        buildDialog(dialog, "Menambah Todo", DialogTone.PRIMARY, loadingBar, body, cancelButton, saveButton);
         dialog.open();
     }
 
@@ -321,7 +337,13 @@ public class TodoView extends VerticalLayout {
         Span uploadHint = new Span("Ganti cover (opsional)");
 
         Dialog dialog = new Dialog();
-        Button saveButton = new Button("Simpan", VaadinIcon.CHECK.create(), event -> {
+        ProgressBar loadingBar = new ProgressBar();
+        loadingBar.setVisible(false);
+
+        Button saveButton = new Button("Simpan", VaadinIcon.CHECK.create());
+        saveButton.addClickListener(event -> {
+            loadingBar.setVisible(true);
+            saveButton.setEnabled(false);
             try {
                 User user = requireUser();
                 String coverPath = null;
@@ -344,8 +366,12 @@ public class TodoView extends VerticalLayout {
                 dialog.close();
                 refreshAll();
             } catch (EntityNotFoundException ex) {
+                loadingBar.setVisible(false);
+                saveButton.setEnabled(true);
                 showError(presenter.showUpdateFailed(ex.getId()));
             } catch (ValidationException | IOException ex) {
+                loadingBar.setVisible(false);
+                saveButton.setEnabled(true);
                 showError(presenter.showValidationError(ex.getMessage()));
             }
         });
@@ -355,7 +381,7 @@ public class TodoView extends VerticalLayout {
         VerticalLayout body = new VerticalLayout(titleField, descriptionField, uploadHint, upload);
         body.setPadding(false);
         body.setSpacing(true);
-        buildDialog(dialog, "Mengubah Todo #" + todo.getId(), DialogTone.PRIMARY, body, cancelButton, saveButton);
+        buildDialog(dialog, "Mengubah Todo #" + todo.getId(), DialogTone.PRIMARY, loadingBar, body, cancelButton, saveButton);
         dialog.open();
     }
 
@@ -366,14 +392,20 @@ public class TodoView extends VerticalLayout {
         message.getStyle().set("margin", "0");
 
         Dialog dialog = new Dialog();
-        Button confirmButton = new Button("Hapus", VaadinIcon.TRASH.create(), event -> {
+        ProgressBar loadingBar = new ProgressBar();
+        loadingBar.setVisible(false);
+
+        Button confirmButton = new Button("Hapus", VaadinIcon.TRASH.create());
+        confirmButton.addClickListener(event -> {
+            loadingBar.setVisible(true);
+            confirmButton.setEnabled(false);
             deleteTodo(todo);
             dialog.close();
         });
         confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
 
         Button cancelButton = new Button("Batal", VaadinIcon.CLOSE.create(), event -> dialog.close());
-        buildDialog(dialog, "Menghapus Todo", DialogTone.DANGER, message, cancelButton, confirmButton);
+        buildDialog(dialog, "Menghapus Todo", DialogTone.DANGER, loadingBar, message, cancelButton, confirmButton);
         dialog.open();
     }
 
@@ -386,6 +418,7 @@ public class TodoView extends VerticalLayout {
             Dialog dialog,
             String title,
             DialogTone tone,
+            ProgressBar loadingBar,
             Component bodyContent,
             Button... footerButtons
     ) {
@@ -412,6 +445,9 @@ public class TodoView extends VerticalLayout {
                 .set("box-sizing", "border-box")
                 .set("width", "100%");
 
+        loadingBar.setIndeterminate(true);
+        loadingBar.getStyle().set("margin", "0").set("height", "4px");
+
         Div body = new Div(bodyContent);
         body.getStyle()
                 .set("background", "#FFFFFF")
@@ -431,9 +467,12 @@ public class TodoView extends VerticalLayout {
                 .set("padding", "0.85rem 1.5rem 1.1rem")
                 .set("box-sizing", "border-box")
                 .set("width", "100%");
+        for (Button btn : footerButtons) {
+            btn.getStyle().set("cursor", "pointer");
+        }
         footer.add(footerButtons);
 
-        Div shell = new Div(header, body, footer);
+        Div shell = new Div(header, loadingBar, body, footer);
         shell.getStyle()
                 .set("display", "flex")
                 .set("flex-direction", "column")

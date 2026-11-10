@@ -33,9 +33,20 @@ vite.generated.ts
 webpack.generated.js
 types.d.ts
 package-lock.json
+yarn.lock
+bun.lockb
+.vaadin/
+
+### Database / H2 ###
+*.mv.db
+*.trace.db
 
 ### Logs & temp ###
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 *.tmp
 *.temp
 *.swp

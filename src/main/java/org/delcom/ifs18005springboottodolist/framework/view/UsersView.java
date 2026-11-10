@@ -47,6 +47,7 @@ public class UsersView extends VerticalLayout implements BeforeEnterObserver {
             Button open = new Button("Lihat Todo", event ->
                     UI.getCurrent().navigate(UserTodosView.class, user.getId()));
             open.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+            open.getStyle().set("cursor", "pointer");
             return open;
         }).setHeader("Tindakan").setAutoWidth(true);
 

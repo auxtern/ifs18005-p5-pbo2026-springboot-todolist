@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -45,21 +46,33 @@ public class LoginView extends VerticalLayout {
         username.setValueChangeMode(ValueChangeMode.EAGER);
         password.setValueChangeMode(ValueChangeMode.EAGER);
 
+        ProgressBar loadingBar = new ProgressBar();
+        loadingBar.setIndeterminate(true);
+        loadingBar.setVisible(false);
+        loadingBar.setWidthFull();
+
+        Button loginButton = new Button("Masuk");
+
         Runnable submit = () -> {
+            loadingBar.setVisible(true);
+            loginButton.setEnabled(false);
             try {
                 User user = authUseCase.login(username.getValue(), password.getValue());
                 AuthSession.login(user);
                 UI.getCurrent().navigate(TodoView.class);
             } catch (ValidationException ex) {
+                loadingBar.setVisible(false);
+                loginButton.setEnabled(true);
                 Notification n = Notification.show(ex.getMessage(), 4000, Notification.Position.BOTTOM_START);
                 n.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         };
 
-        Button loginButton = new Button("Masuk", event -> submit.run());
+        loginButton.addClickListener(event -> submit.run());
         loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         loginButton.setWidthFull();
         loginButton.getStyle().set("margin-top", "0.85rem");
+        loginButton.getStyle().set("cursor", "pointer");
         username.addKeyUpListener(Key.ENTER, event -> submit.run());
         password.addKeyUpListener(Key.ENTER, event -> submit.run());
 
@@ -72,16 +85,17 @@ public class LoginView extends VerticalLayout {
         RouterLink registerLink = new RouterLink("Belum punya akun? Daftar", RegisterView.class);
         registerLink.getStyle()
                 .set("align-self", "flex-end")
-                .set("text-align", "right");
+                .set("text-align", "right")
+                .set("cursor", "pointer");
 
         VerticalLayout form = new VerticalLayout(
                 title,
                 subtitle,
                 username,
                 password,
+                loadingBar,
                 loginButton,
-                registerLink
-        );
+                registerLink);
         form.setPadding(false);
         form.setSpacing(false);
         form.setWidthFull();
