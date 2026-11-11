@@ -40,8 +40,8 @@ public class LoginView extends VerticalLayout {
 
         TextField username = new TextField("Username");
         PasswordField password = new PasswordField("Password");
-        username.setId("login-username");
-        password.setId("login-password");
+        setInnerInputId(username, "login-username");
+        setInnerInputId(password, "login-password");
         username.setWidthFull();
         password.setWidthFull();
         // Agar nilai sudah sampai server sebelum Enter memicu submit.
@@ -118,5 +118,27 @@ public class LoginView extends VerticalLayout {
                 .set("box-sizing", "border-box");
 
         add(card);
+    }
+
+    private void setInnerInputId(com.vaadin.flow.component.Component component, String id) {
+        Runnable apply = () -> component.getElement().executeJs(
+                "const applyId = () => {" +
+                "  const input = this.inputElement || this.querySelector('input');" +
+                "  if (input) {" +
+                "    input.id = $0;" +
+                "    const label = this.querySelector('label');" +
+                "    if (label) label.setAttribute('for', $0);" +
+                "    return true;" +
+                "  }" +
+                "  return false;" +
+                "};" +
+                "if (!applyId()) {" +
+                "  if (this.updateComplete) { this.updateComplete.then(applyId); }" +
+                "  const obs = new MutationObserver(() => { if (applyId()) obs.disconnect(); });" +
+                "  obs.observe(this, { childList: true, subtree: true });" +
+                "}", id);
+
+        apply.run();
+        component.addAttachListener(event -> apply.run());
     }
 }
